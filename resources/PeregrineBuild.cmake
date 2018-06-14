@@ -11,8 +11,12 @@ set (DAKOTA_PYTHON ON CACHE BOOL "python interface on" FORCE)
 # Stop being in debug mode please - does nothing
 set (MPI_DEBUG OFF CACHE BOOL "mpi debug off" FORCE)
 
-set(BLAS_LIBS "$ENV{BLASLIB}" CACHE STRING "Use epel blas/lapack" FORCE) 
-set(LAPACK_LIBS "$ENV{BLASLIB}" CACHE STRING "Use epel blas/lapack" FORCE)
+set(BLAS_LIBS "$ENV{MKLROOT}/lib/intel64" CACHE STRING "Use epel blas/lapack" FORCE) 
+set(LAPACK_LIBS "$ENV{MKLROOT}/lib/intel64" CACHE STRING "Use epel blas/lapack" FORCE)
+set(BLAS_LIBRARY_DIRS /nopt/intel/psxe2017u2/compilers_and_libraries_2017.5.239/linux/mkl/lib/intel64 CACHE PATH "Use epel blas/lapack" FORCE)
+set(BLAS_LIBS "mkl_gf_lp64;mkl_sequential;mkl_core;pthread" CACHE STRING "Use epel blas/lapack" FORCE)
+set(LAPACK_LIBRARY_DIRS /nopt/intel/psxe2017u2/compilers_and_libraries_2017.5.239/linux/mkl/lib/intel64 CACHE PATH "Use epel blas/lapack" FORCE)
+set(LAPACK_LIBS "mkl_gf_lp64;mkl_sequential;mkl_core;pthread"  CACHE STRING "Use epel blas/lapack" FORCE)
 
 
 ### yes mpi
