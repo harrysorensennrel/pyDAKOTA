@@ -42,7 +42,8 @@ import subprocess
 import sys
 
 from distutils.spawn import find_executable
-from pkg_resources import get_build_platform
+from distutils.sysconfig import get_python_inc
+import pkg_resources
 from setuptools import setup, find_packages
 from setuptools.extension import Extension
 
@@ -71,7 +72,7 @@ else:
 
 wrapper_version = '1'
 egg_dir = 'pyDAKOTA-%s_%s-py%s-%s.egg' % (dakota_version, wrapper_version,
-                                          sys.version[0:3], get_build_platform())
+                                          sys.version[0:3], pkg_resources.get_build_platform())
 
 # Assuming standard prefix-based install.
 dakota_install = os.path.dirname(
@@ -131,8 +132,8 @@ EGG_LIBS = []
 # Set True to include MPI support.
 NEED_MPI = '-DDAKOTA_HAVE_MPI' in dakota_macros['Dakota_DEFINES']
 
-include_dirs = ['/nopt/nrel/apps/mpi4py/1.3.1/openmpi-gcc-1.7.3-4.8.2-python-2.7.6-gcc-4.8.2_140404/lib/python2.7/site-packages/mpi4py/include', dakota_include, numpy_include]
-    #include_dirs.append('/nopt/nrel/apps/mpi4py/1.3.1/openmpi-gcc-1.7.3-4.8.2-python-2.7.6-gcc-4.8.2_140404/lib/python2.7/site-packages/mpi4py/include')
+mpi_include = pkg_resources.resource_filename('mpi4py','include')
+include_dirs = [dakota_include, numpy_include, mpi_include]
 library_dirs = [dakota_lib, dakota_bin]
 
 if sys.platform == 'cygwin':  # Only tested with DAKOTA 5.3.
@@ -194,8 +195,10 @@ else:
 
     #BOOST_INCDIR = '/nopt/nrel/apps/boost/1.55.0-openmpi-gcc_140415/include'
     #BOOST_LIBDIR = '/nopt/nrel/apps/boost/1.55.0-openmpi-gcc_140415/lib'
-    BOOST_INCDIR = '/nopt/nrel/apps/boost/1.55.0-openmpi-gcc_140415/include'
-    BOOST_LIBDIR = '/nopt/nrel/apps/boost/1.55.0-openmpi-gcc_140415/lib'
+    #BOOST_INCDIR = '/nopt/nrel/apps/boost/1.55.0-openmpi-gcc_140415/include'
+    #BOOST_LIBDIR = '/nopt/nrel/apps/boost/1.55.0-openmpi-gcc_140415/lib'
+    BOOST_INCDIR = os.path.dirname(get_python_inc())
+    BOOST_LIBDIR = os.path.join(os.path.dirname(BOOST_INCDIR),'lib')
 
     #include_dirs.append('/nopt/nrel/apps/boost/1.55.0-openmpi-gcc_140415/include/boost')
     #library_dirs.append('/nopt/nrel/apps/openmpi/1.7.3-serial-gcc-4.8.2/lib')
@@ -236,10 +239,12 @@ if dakota_libs[0].startswith('-l'):
 # From Makefile.export.Dakota Dakota_TPL_LIBRARIES.
 external_libs = [
     'boost_regex', 'boost_filesystem', 'boost_serialization', 'boost_system',
-    'boost_signals', 'boost_python']#, 'lapack', 'blas']
+    'boost_signals', 'boost_python27',]# 'boost_python', 'lapack', 'blas']
 
 if NEED_MPI:
-    external_libs.append('boost_mpi')
+    # MPI should be provided by libmpi
+    #external_libs.append('boost_mpi')
+    external_libs.append('mpi_cxx')
     os.environ['CC'] = 'mpicxx'  # Force compiler command.
 
 # Munge boost library names as necessary.
@@ -280,4 +285,3 @@ setup(name='pyDAKOTA',
       package_dir={'':'src'},
       zip_safe=False,
       data_files=data_files)
-

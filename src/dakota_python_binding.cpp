@@ -24,10 +24,11 @@ static void sayhello(MPI_Comm comm)
 
 #include "dakface.hpp"
 #include <boost/python.hpp>
+#include <boost/python/numpy.hpp>
 #include <mpi4py/mpi4py.h>
 //using namespace boost::python;
 namespace bp = boost::python;
-namespace bpn = boost::python::numeric;
+namespace bpn = boost::python::numpy;
 
 #define MAKE_ARGV \
   char *argv[10]; \
@@ -70,7 +71,7 @@ int run_dakota_mpi(char *infile, bp::object py_comm, char *outfile, char *errfil
   MPI_Comm *comm_p = PyMPIComm_Get(py_obj);
   if (comm_p == NULL) bp::throw_error_already_set();
   //sayhello(*comm_p);
-  MPI_Comm comm = * comm_p ; 
+  MPI_Comm comm = * comm_p ;
   }
 
   MAKE_ARGV
@@ -93,7 +94,7 @@ void translator(const int& exc)
     //     PyErr_SetString(PyExc_RuntimeError, "DAKOTA run failed");
   }
 }
-    
+
 
 #include <boost/python.hpp>
 #include <numpy/arrayobject.h>
@@ -104,7 +105,7 @@ BOOST_PYTHON_MODULE(pyDAKOTA)
   if (import_mpi4py() < 0) return; /* Python 2.X */
 
   import_array();
-  array::set_module_and_type("numpy", "ndarray");
+  //array::set_module_and_type("numpy", "ndarray");
 
   register_exception_translator<int>(&translator);
 
